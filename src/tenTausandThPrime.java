@@ -17,7 +17,6 @@ public class tenTausandThPrime {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 		
-		long res = Math.lo
 		//System.out.println(trialDivision(Long.parseLong("600851475143")));
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
