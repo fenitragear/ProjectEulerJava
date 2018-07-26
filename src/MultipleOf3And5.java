@@ -35,7 +35,7 @@ public class MultipleOf3And5 {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 		
-		System.out.println(sumOfMultipleOf3And5(1000));
+		System.out.println(sumOfMultipleOf3And5(10));
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");		
 	}
 }
