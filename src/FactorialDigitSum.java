@@ -1,4 +1,6 @@
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 
 /**
  * https://projecteuler.net/problem=20
@@ -7,7 +9,27 @@ import java.math.BigInteger;
  *
  */
 public class FactorialDigitSum {
+	
+	private static final double LOG10 = Math.log(10.0);
 
+	/**
+	 * Computes the natural logarithm of a BigInteger. Works for really big
+	 * integers (practically unlimited)
+	 * 
+	 * @param val Argument, positive integer
+	 * @return Natural logarithm, as in <tt>Math.log()</tt>
+	 */
+	public static double logBigInteger(BigInteger val) {
+	    int blex = val.bitLength() - 1022;
+	    
+	    if (blex > 0)
+	        val = val.shiftRight(blex);
+	    
+	    double res = Math.log10(val.doubleValue());
+	    
+	    return blex > 0 ? res + blex * LOG10 : res;
+	}
+	
 	/**
 	 * Digit sum formula:
 	 * 		For n = 0 ... log10(n)
@@ -17,56 +39,24 @@ public class FactorialDigitSum {
 	 * 		x is the number to calculate the digit
 	 * 		b is the base
 	 *  
-	 * @param n
+	 * @param x
+	 * 
 	 * @return
 	 */
-	static long sum(int n) {
-		BigInteger factorial = factorial(n);
-		BigInteger sum = BigInteger.valueOf(0);
+	static BigInteger sum(int x) {
+		BigInteger factorial = factorial(x);
+		BigDecimal sum = BigDecimal.valueOf(0);
+		long lim = Math.round(logBigInteger(factorial));
 		
-		for(int j = 0; j < Math.log10(factorial.longValue()); j++) {			
-			sum = sum.add(new BigInteger(String.valueOf(1 / Math.pow(10, j))).multiply(
-								factorial.mod(
-										new BigInteger(String.valueOf(Math.pow(10, j + 1)))
-								).subtract(
-										factorial.mod(
-												new BigInteger(String.valueOf(Math.pow(10, j)))
-										)
-									)
-								)
-					);
-		}
-		
-		System.out.println(String.format("factorial of %d! = %d", n, factorial));
-		
-		return sum.longValue();
-	}
-	
-	/**
-	 * Factorial Prime Factorization formula:
-	 * 		n! = product(s_i^r_i) = 2^r_1 * 3^r_2 * 5^r_3 * ... * p
-	 * 
-	 * Where:
-	 * 		p denote the largest prime
-	 * 		r denote the power of each prime number
-	 * 
-	 * @param n
-	 * @return
-	 */
-	static BigInteger factorial(int n) {
-		int[][] primeFactorizations = getPrimeFactorization(n);
-		BigInteger factorial = BigInteger.valueOf(1);
-		
-		for(int i = 0; i < primeFactorizations.length; i++) {
-			int s = primeFactorizations[i][0];
-			int r = primeFactorizations[i][1];
+		for(int n = 0; n < lim; n++) {		
+			BigDecimal a = BigDecimal.valueOf(1 / Math.pow(10, n));
+			BigInteger b = factorial.mod(BigDecimal.valueOf(Math.pow(10, n + 1)).toBigInteger());
+			BigInteger c = factorial.mod(BigDecimal.valueOf(Math.pow(10, n)).toBigInteger());
 			
-			factorial = factorial.multiply(
-						BigInteger.valueOf((long) Math.pow(s, r))
-					);
+			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))).setScale(2, BigDecimal.ROUND_HALF_UP));
 		}
-		
-		return factorial;
+				
+		return sum.toBigInteger();
 	}
 	
 	/**
@@ -77,15 +67,21 @@ public class FactorialDigitSum {
 	 * 			val1 = the number that x can divide between 1 and n
 	 * 				while val1 is greater than 1
 	 * 					find the number that x can divide between 1 and val1
+	 *  
+	 * Factorial Prime Factorization formula:
+	 * 		n! = product(s_i^r_i) = 2^r_1 * 3^r_2 * 5^r_3 * ... * p
+	 * 
+	 * Where:
+	 * 		p denote the largest prime
+	 * 		r denote the power of each prime number
 	 * 
 	 * @param n
 	 * 
-	 * @return tab[s][r] - where s is the prime factorization and r the power
+	 * @return
 	 */
-	static int[][] getPrimeFactorization(int n) {
-		int[][] primes = new int[(n - 1) / 2][2];
+	static BigInteger factorial(int n) {
+		BigInteger factorial = BigInteger.valueOf(1);
 		boolean[] tab = new boolean[n + 1];
-		int index = 0;
 		
 		for(int i = 2; i < Math.sqrt(tab.length); i++) {
 			if(!tab[i]) {
@@ -97,30 +93,25 @@ public class FactorialDigitSum {
 		
 		for(int i = 2; i < tab.length; i++) {
 			if(!tab[i]) {
-				int power = 1;
+				int r = n;
+				int power = 0;
 				
-				if(index < (primes.length - 1)) {
-					int r = n;
-					power = 0;
+				while(r > 1) {
+					int count = 0;
 					
-					while(r > 1) {
-						int count = 0;
-						
-						for(int x = i; x <= r; x += i) {
-							count++;
-						}
-						
-						r = count++;
-						power += r;
+					for(int x = i; x <= r; x += i) {
+						count++;
 					}
-				}				
-				
-				primes[index][0] = i;
-				primes[index++][1] = power;
+					
+					r = count++;
+					power += r;
+				}		
+								
+				factorial = factorial.multiply(BigDecimal.valueOf(i).pow(power).toBigInteger());
 			}
 		}
 		
-		return primes;
+		return factorial;
 	}
 	
 	/**
@@ -135,7 +126,7 @@ public class FactorialDigitSum {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 		
-		System.out.println(sum(10));
+		System.out.println(sum(100));
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
 }
