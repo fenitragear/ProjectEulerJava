@@ -43,7 +43,7 @@ public class FactorialDigitSum {
 	 * 
 	 * @return
 	 */
-	static BigInteger sum(int x) {
+	static int sum(int x) {
 		BigInteger factorial = factorial(x);
 		BigDecimal sum = BigDecimal.valueOf(0);
 		long lim = Math.round(logBigInteger(factorial));
@@ -53,10 +53,10 @@ public class FactorialDigitSum {
 			BigInteger b = factorial.mod(BigDecimal.valueOf(Math.pow(10, n + 1)).toBigInteger());
 			BigInteger c = factorial.mod(BigDecimal.valueOf(Math.pow(10, n)).toBigInteger());
 			
-			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))).setScale(2, BigDecimal.ROUND_HALF_UP));
+			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))).setScale(1, BigDecimal.ROUND_CEILING));
 		}
 				
-		return sum.toBigInteger();
+		return sum.intValue();
 	}
 	
 	/**
