@@ -1,6 +1,5 @@
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 
 /**
  * https://projecteuler.net/problem=20
@@ -53,10 +52,10 @@ public class FactorialDigitSum {
 			BigInteger b = factorial.mod(BigDecimal.valueOf(Math.pow(10, n + 1)).toBigInteger());
 			BigInteger c = factorial.mod(BigDecimal.valueOf(Math.pow(10, n)).toBigInteger());
 			
-			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))).setScale(1, BigDecimal.ROUND_CEILING));
+			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c)).setScale(1, BigDecimal.ROUND_CEILING)).setScale(1, BigDecimal.ROUND_CEILING));
 		}
-				
-		return sum.intValue();
+		
+		return sum.setScale(0, BigDecimal.ROUND_CEILING).intValue();
 	}
 	
 	/**
