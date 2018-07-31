@@ -44,18 +44,18 @@ public class FactorialDigitSum {
 	 */
 	static int sum(int x) {
 		BigInteger factorial = factorial(x);
-		BigDecimal sum = BigDecimal.valueOf(0);
+		BigDecimal sum = BigDecimal.ZERO;
 		long lim = Math.round(logBigInteger(factorial));
 		
-		for(int n = 0; n < lim; n++) {		
-			BigDecimal a = BigDecimal.valueOf(1 / Math.pow(10, n));
-			BigInteger b = factorial.mod(BigDecimal.valueOf(Math.pow(10, n + 1)).toBigInteger());
-			BigInteger c = factorial.mod(BigDecimal.valueOf(Math.pow(10, n)).toBigInteger());
+		for(int i = 0; i <= lim; i++) {		
+			BigDecimal a = BigDecimal.ONE.divide(BigDecimal.TEN.pow(i));
+			BigInteger b = factorial.mod(BigDecimal.TEN.pow(i + 1).toBigInteger());
+			BigInteger c = factorial.mod(BigDecimal.TEN.pow(i).toBigInteger());
 			
-			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c)).setScale(1, BigDecimal.ROUND_CEILING)).setScale(1, BigDecimal.ROUND_CEILING));
+			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))));
 		}
 		
-		return sum.setScale(0, BigDecimal.ROUND_CEILING).intValue();
+		return sum.intValue();
 	}
 	
 	/**
