@@ -8,7 +8,7 @@ import java.math.BigInteger;
  *
  */
 public class PowerDigitSum {
-	
+		
 	/**
 	 * Digit sum formula:
 	 * 		For n = 0 ... log10(n)
@@ -27,10 +27,11 @@ public class PowerDigitSum {
 		BigDecimal sum = BigDecimal.ZERO;
 		long lim = Math.round(Math.log10(powerDigit.doubleValue()));
 		
-		for(int i = 0; i <= lim; i++) {		
-			BigDecimal a = BigDecimal.ONE.divide(BigDecimal.TEN.pow(i));
-			BigInteger b = powerDigit.mod(BigDecimal.TEN.pow(i + 1).toBigInteger());
-			BigInteger c = powerDigit.mod(BigDecimal.TEN.pow(i).toBigInteger());
+		for(int i = 0; i <= lim; i++) {
+			BigDecimal tenPowI = BigDecimal.TEN.pow(i);
+			BigDecimal a = BigDecimal.ONE.divide(tenPowI);
+			BigInteger b = powerDigit.remainder(BigInteger.TEN.pow(i + 1));
+			BigInteger c = powerDigit.remainder(tenPowI.toBigInteger());
 			
 			sum = sum.add(a.multiply(new BigDecimal(b.subtract(c))));
 		}
@@ -39,7 +40,7 @@ public class PowerDigitSum {
 	}
 	
 	/**
-	 * 215 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.
+	 * 2^15 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.
 	 * What is the sum of the digits of the number 21000?
 	 * 
 	 * @param args

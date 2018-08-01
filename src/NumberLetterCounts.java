@@ -2,7 +2,6 @@ import java.util.HashMap;
 
 /**
  * https://projecteuler.net/problem=17
- * TODO
  * 
  * @author Stéphan R.
  *
