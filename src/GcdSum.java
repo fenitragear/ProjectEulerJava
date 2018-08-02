@@ -55,16 +55,14 @@ public class GcdSum {
         if (n > 1)
             result *= (1.0 - (1.0 / (float) n));
  
-        return (int)result;
+        return (int) result;
 	}
 	
 	static long gcdSum(int n) {
 		long sum = 0;
 		
-		for(int j = 1; j <= Math.sqrt(n); j++) {
-			for(int i = 1; i <= j; i++) {
-				sum += gcd(i, j);
-			}
+		for(int i = 1; i <= n; i++) {
+			sum += gcd(i, n);
 		}
 		
 		return sum % 998244353;
@@ -73,7 +71,7 @@ public class GcdSum {
 	/**
 	 * G(N) = ∑N-j=1 ∑j-i=1 gcd(i,j) . 
 	 * You are given: G(10) = 122.
-	 * Find G(1011). Give your answer modulo 998244353
+	 * Find G(10^11). Give your answer modulo 998244353
 
 	 * @param args
 	 */
