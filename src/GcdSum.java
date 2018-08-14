@@ -61,15 +61,17 @@ public class GcdSum {
 	static long gcdSum(int n) {
 		long sum = 0;
 		
-		for(int i = 1; i <= n; i++) {
-			sum += gcd(i, n);
+		for(int j = 1; j <= n; j++) {
+			for(int i  = 1; i <= j; i++) {
+				sum += gcd(i, j);
+			}
 		}
 		
-		return sum % 998244353;
+		return sum;
 	}
 	
 	/**
-	 * G(N) = ∑N-j=1 ∑j-i=1 gcd(i,j) . 
+	 * G(N) = ∑N<-j=1 ∑j<-i=1 gcd(i,j) . 
 	 * You are given: G(10) = 122.
 	 * Find G(10^11). Give your answer modulo 998244353
 
@@ -78,7 +80,8 @@ public class GcdSum {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 		
-		System.out.println(gcdSum((int) Math.pow(10, 11)));
+		System.out.println(gcdSum((int) Math.pow(10, 1)));
+		System.out.println(phi(10));
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
 }

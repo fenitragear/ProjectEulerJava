@@ -14,29 +14,7 @@ public class CircularPrimes {
 
 	private static List<Integer> primes = new ArrayList<>();
 	private static List<Integer> circularPrimes = new ArrayList<>();
-	
-	static void rotate(int[] arr, int length) {
-		for(int shift = 1; shift <= length; shift++) {
-			boolean skipRotation = (shift % length == 0) ? true : false;
-			shift = (skipRotation) ? 1 : (length - (shift % length));
-
-			if(!skipRotation) {
-				for(int r = 0; r < shift; r++) {
-					for(int i = 0; i < length; i++) {
-						if(i != length - 1) {
-							arr[i] = arr[i] ^ arr[length - 1];
-							arr[length - 1] = arr[i] ^ arr[length - 1];
-							arr[i] = arr[i] ^ arr[length - 1];
-						}
-					}
-				}
-				
-				//if(String.join("", arr))
-			}
-		}
 		
-	}
-	
 	static void loadPrimes() {
 		boolean[] tab = new boolean[(int) (Math.pow(10, 6) + 1)];
 		

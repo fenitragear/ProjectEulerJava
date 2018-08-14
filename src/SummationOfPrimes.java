@@ -46,8 +46,8 @@ public class SummationOfPrimes {
 			if (!a[m]) {
 				sum += m;
 			}
-		}	            		
-	    				
+		}
+	    
 	    return sum;
 	}
 	

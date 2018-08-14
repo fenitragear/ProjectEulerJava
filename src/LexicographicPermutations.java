@@ -16,30 +16,30 @@ public class LexicographicPermutations {
 		return n * factorial(n - 1);
 	}
 	
-	static String lexicographicOrder(String n) {		
+	static void lexicographicOrder(String n) {
+		byte[] b = Arrays.copyOf(n.getBytes(), n.length());
 		int lim = factorial(n.length());
-		int step = 0;
+		int step = 1;
 		
 		for(int count = 0, i = 0; count < lim; count++) {
-			byte[] b = Arrays.copyOf(n.getBytes(), n.length());
-			
 			if(i >= (b.length - 1)) {
+				b = Arrays.copyOf(n.getBytes(), n.length());
 				i = 0;
-				step--;
 			}
-						
-			if(count > 0 && (i + step) < b.length) {
+			
+			if((i + i) < b.length) {
 				byte temp = b[i];
-				b[i] = b[i + step];
-				b[i + step] = temp;
-				step++;
+				b[i] = b[b.length - step];
+				b[b.length - step] = temp;
+			}
+			
+			if(++step >= lim / 2) {
+				step = 1;
 			}
 			
 			i++;
 			System.out.println(new String(b));
 		}
-		
-		return null;
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class LexicographicPermutations {
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
 		
-		System.out.println(lexicographicOrder("012"));
+		lexicographicOrder("012");
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
 }
