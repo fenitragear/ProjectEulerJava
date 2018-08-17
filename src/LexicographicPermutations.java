@@ -1,45 +1,57 @@
-import java.util.Arrays;
 
 /**
  * https://projecteuler.net/problem=24
- * TODO
  * 
  * @author Stéphan R.
  *
  */
 public class LexicographicPermutations {
-
-	static int factorial(int n) {
-		if(n == 0 || n == 1) 
-			return 1;
-		
-		return n * factorial(n - 1);
-	}
 	
-	static void lexicographicOrder(String n) {
-		byte[] b = Arrays.copyOf(n.getBytes(), n.length());
-		int lim = factorial(n.length());
-		int step = 1;
-		
-		for(int count = 0, i = 0; count < lim; count++) {
-			if(i >= (b.length - 1)) {
-				b = Arrays.copyOf(n.getBytes(), n.length());
-				i = 0;
-			}
-			
-			if((i + i) < b.length) {
-				byte temp = b[i];
-				b[i] = b[b.length - step];
-				b[b.length - step] = temp;
-			}
-			
-			if(++step >= lim / 2) {
-				step = 1;
-			}
-			
-			i++;
-			System.out.println(new String(b));
-		}
+	/**
+	 * 		1/ Find the largest x such that P[x]<P[x+1].
+	 * 		   (If there is no such x, P is the last permutation.)
+	 * 		2/ Find the largest y such that P[x]<P[y].
+	 * 		3/ Swap P[x] and P[y].
+	 * 		4/ Reverse P[x+1 .. n].
+	 * 
+	 * @param array
+	 */
+	static void lexicographicOrder(int[] array) {
+		// Find longest non-increasing suffix
+	    int i = array.length - 1;
+	    
+	    while (i > 0 && array[i - 1] >= array[i])
+	        i--;
+	    // Now i is the head index of the suffix
+	    
+	    // Are we at the last permutation already?
+	    if (i <= 0)
+	        return;
+	    
+	    // Let array[i - 1] be the pivot
+	    // Find rightmost element that exceeds the pivot
+	    int j = array.length - 1;
+	    
+	    while (array[j] <= array[i - 1])
+	        j--;
+	    // Now the value array[j] will become the new pivot
+	    // Assertion: j >= i
+	    
+	    // Swap the pivot with j
+	    int temp = array[i - 1];
+	    array[i - 1] = array[j];
+	    array[j] = temp;
+	    
+	    // Reverse the suffix
+	    j = array.length - 1;
+	    
+	    while (i < j) {
+	        temp = array[i];
+	        array[i] = array[j];
+	        array[j] = temp;
+	        i++;
+	        j--;
+	    }
 	}
 	
 	/**
@@ -55,8 +67,19 @@ public class LexicographicPermutations {
 	 */
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
+		int[] array = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		
-		lexicographicOrder("012");
+		for (int i = 0; i < 999999; i++) {
+			lexicographicOrder(array);
+		}		
+		
+		String ans = "";
+		
+		for (int i = 0; i < array.length; i++)
+			ans += array[i];
+		
+		System.out.println(ans);
+		
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
 }
