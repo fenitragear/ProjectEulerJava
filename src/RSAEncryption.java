@@ -8,6 +8,7 @@
 public class RSAEncryption {
 	
 	/**
+	 * Euclid Algorithm
 	 * 
 	 * @param a
 	 * @param b
@@ -53,9 +54,9 @@ public class RSAEncryption {
 		long phi = (p - 1) * (q - 1);
 		long sumValueOfE = 0;
 		
-		for(int e = 3; e < phi; e += 4) {
+		for(long e = 11; e < phi; e += 12) {
 			if(isCoprime(e, phi)) {
-				if((gcd((e -1), (p - 1)) + 1) * (gcd((e - 1), (q - 1)) + 1) == 9) {
+				if(gcd((e -1), (p - 1)) + 1 == 3 && gcd((e - 1), (q - 1)) + 1 == 3) {
 					sumValueOfE += e;
 				}
 			}
