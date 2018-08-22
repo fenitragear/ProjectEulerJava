@@ -142,10 +142,11 @@ public class RSAEncryption {
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 	
 		System.out.println(numberOfUnconcealedMessage(1009 - 1, 3643 - 1));
 		
-		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
+		long end = System.nanoTime();
+		System.out.println("Solution took " + ((end - start) / 1000000) + "ms");
 	}
 }
