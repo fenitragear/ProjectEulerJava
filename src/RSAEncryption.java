@@ -7,24 +7,62 @@
  */
 public class RSAEncryption {
 	
-	/**
-	 * Euclid Algorithm
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	static long gcd(long a, long b) {
-		if (a < 0 || b < 0)
-			throw new IllegalArgumentException("Negative number");
+	static long trialDivision(long n) {
+		while(n % 2 == 0) {
+			n /= 2;
+		}
+
+		if(n == 1)
+			return 2;
 		
-		while (b != 0) {
-			long z = a % b;
-			a = b;
-			b = z;
+		long f = 3;
+
+		while((f * f) <= n) {
+			if(n % f == 0) {
+				n /= f;
+			} else {
+				f += 2;
+			}
+		}
+
+		return (n > 2) ? n : f;
+	}
+	
+	static long binary(long a, long b) {
+		int shift;
+		
+		if(a == 0) {
+			return b;
 		}
 		
-		return a;
+		if(b == 0) {
+			return a;
+		}
+		
+		for(shift = 0; ((a | b) & 1) == 0; ++shift) {
+			a >>= 1;
+			b >>= 1;
+		}
+		
+		while((a & 1) == 0) {
+			a >>= 1;
+		}
+		
+		do {
+			while((b & 1) == 0) {
+				b >>= 1;
+			}
+			
+			if(a > b) {
+				a ^= b;
+				b ^= a;
+				a ^= b;
+			}
+			
+			b = b - a;
+		} while(b != 0);
+		
+		return a << shift;
 	}
 	
 	/**
@@ -35,33 +73,41 @@ public class RSAEncryption {
 	 * @return
 	 */
 	static Boolean isCoprime(long a, long b) {
-		if(((a|b) & 1) == 0)
+		if(((a | b) & 1) == 0)
 			return false;
 		
-		return gcd(a, b) == 1;
+		return binary(a, b) == 1;
 	}
 	
 	/**
 	 * e and phi must be coprime
-	 * Unconcealed message is at the minimum => (1 + gcd((e - 1), (p - 1)) * (1 + gcd((e - 1), (q - 1)))
+	 * Unconcealed message is at the minimum => (1 + gcd((e - 1), (p - 1)) * (1 + gcd((e - 1), (q - 1))) == 9
 	 * 
-	 * @param p
-	 * @param q
+	 * @param p -> p - 1
+	 * @param q -> q - 1
 	 * 
 	 * @return
 	 */
-	static long sumOfAllValueE(long p, long q) {
-		long phi = (p - 1) * (q - 1);
+	static long numberOfUnconcealedMessage(long p, long q) {
+		long pLargestPrimeFactor = trialDivision(p);
+		long qLargestPrimeFactor = trialDivision(q);
+		long phi = p * q;
 		long sumValueOfE = 0;
 		
-		for(long e = 11; e < phi; e += 12) {
-			if(isCoprime(e, phi)) {
-				if(gcd((e -1), (p - 1)) + 1 == 3 && gcd((e - 1), (q - 1)) + 1 == 3) {
-					sumValueOfE += e;
-				}
+		for(long e = 3; e < phi; e += 2) {
+			if(e % 12 == 11) {
+				if(e % pLargestPrimeFactor > 1 && e % qLargestPrimeFactor > 1) {
+					if(isCoprime(e, phi)) {
+						long E = (e - 1);
+						
+						if(binary(E, phi) == 2) {
+							sumValueOfE += e;
+						}
+					}	
+				}	
 			}
 		}
-						
+				
 		return sumValueOfE;
 	}
 
@@ -97,8 +143,8 @@ public class RSAEncryption {
 	 */
 	public static void main(String[] args) {		
 		long start = System.currentTimeMillis();
-		
-		System.out.println(sumOfAllValueE(1009, 3643));
+	
+		System.out.println(numberOfUnconcealedMessage(1009 - 1, 3643 - 1));
 		
 		System.out.println("Solution took " + (System.currentTimeMillis() - start) + "ms");
 	}
