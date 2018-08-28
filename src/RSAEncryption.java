@@ -7,25 +7,33 @@
  */
 public class RSAEncryption {
 	
-	static long trialDivision(long n) {
+	static long wheelFactorization(long n) {
+		int[] inc = new int[] { 4, 2, 4, 2, 4, 6, 2, 6 };
+		int k = 7;
+		int i = 1;
+		
 		while(n % 2 == 0) {
 			n /= 2;
 		}
-
-		if(n == 1)
-			return 2;
 		
-		long f = 3;
-
-		while((f * f) <= n) {
-			if(n % f == 0) {
-				n /= f;
+		while(n % 3 == 0) {
+			n /= 3;
+		}
+		
+		while(n % 5 == 0) {
+			n /= 5;
+		}
+				
+		while(k * k <= n) {
+			if(n % k == 0) {
+				n /= k;
 			} else {
-				f += 2;
+				k += inc[i];
+				i = (i < 8) ? i++ : 1;
 			}
 		}
-
-		return (n > 2) ? n : f;
+		
+		return n;
 	}
 	
 	static long binary(long a, long b) {
@@ -38,7 +46,7 @@ public class RSAEncryption {
 		if(b == 0) {
 			return a;
 		}
-		
+				
 		for(shift = 0; ((a | b) & 1) == 0; ++shift) {
 			a >>= 1;
 			b >>= 1;
@@ -54,9 +62,9 @@ public class RSAEncryption {
 			}
 			
 			if(a > b) {
-				a ^= b;
-				b ^= a;
-				a ^= b;
+				long temp = a;
+				a = b;
+				b = temp;
 			}
 			
 			b = b - a;
@@ -89,25 +97,23 @@ public class RSAEncryption {
 	 * @return
 	 */
 	static long numberOfUnconcealedMessage(long p, long q) {
-		long pLargestPrimeFactor = trialDivision(p);
-		long qLargestPrimeFactor = trialDivision(q);
+		long pLargestPrimeFactor = wheelFactorization(p);
+		long qLargestPrimeFactor = wheelFactorization(q);		
 		long phi = p * q;
 		long sumValueOfE = 0;
 		
 		for(long e = 3; e < phi; e += 2) {
 			if(e % 12 == 11) {
 				if(e % pLargestPrimeFactor > 1 && e % qLargestPrimeFactor > 1) {
-					if(isCoprime(e, phi)) {
-						long E = (e - 1);
-						
-						if(binary(E, phi) == 2) {
+					if(isCoprime(e, phi)) {						
+						if(binary((e - 1), phi) == 2) {
 							sumValueOfE += e;
 						}
 					}	
-				}	
+				}
 			}
 		}
-				
+		
 		return sumValueOfE;
 	}
 
@@ -142,11 +148,12 @@ public class RSAEncryption {
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		long start = System.nanoTime();
+		double start = System.nanoTime();
 	
+		//System.out.println(numberOfUnconcealedMessage(991777 - 1, 999983 - 1));
 		System.out.println(numberOfUnconcealedMessage(1009 - 1, 3643 - 1));
 		
-		long end = System.nanoTime();
-		System.out.println("Solution took " + ((end - start) / 1000000) + "ms");
+		double end = System.nanoTime();
+		System.out.printf("Solution took %f.6ms", ((end - start) / 1000000));
 	}
 }
