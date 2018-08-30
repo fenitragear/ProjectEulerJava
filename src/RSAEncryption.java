@@ -1,3 +1,4 @@
+import java.util.Arrays;
 
 /**
  * https://projecteuler.net/problem=182
@@ -7,86 +8,39 @@
  */
 public class RSAEncryption {
 	
-	static long wheelFactorization(long n) {
-		int[] inc = new int[] { 4, 2, 4, 2, 4, 6, 2, 6 };
-		int k = 7;
-		int i = 1;
-		
-		while(n % 2 == 0) {
+	static long trialDivision2(long n) {		
+		while((n & 1) == 0) {
 			n /= 2;
 		}
+
+		if(n == 1)
+			return 2;
 		
-		while(n % 3 == 0) {
-			n /= 3;
-		}
-		
-		while(n % 5 == 0) {
-			n /= 5;
-		}
-				
-		while(k * k <= n) {
-			if(n % k == 0) {
-				n /= k;
+		int f = 3;
+
+		while((f * f) <= n) {
+			if(n % f == 0) {
+				n /= f;
 			} else {
-				k += inc[i];
-				i = (i < 8) ? i++ : 1;
+				f += 2;
 			}
 		}
 		
-		return n;
+		return (n > 2) ? n : f;
 	}
 	
-	static long binary(long a, long b) {
-		int shift;
-		
-		if(a == 0) {
-			return b;
-		}
-		
-		if(b == 0) {
-			return a;
-		}
-				
-		for(shift = 0; ((a | b) & 1) == 0; ++shift) {
-			a >>= 1;
-			b >>= 1;
-		}
-		
-		while((a & 1) == 0) {
-			a >>= 1;
-		}
-		
-		do {
-			while((b & 1) == 0) {
-				b >>= 1;
-			}
-			
-			if(a > b) {
-				long temp = a;
-				a = b;
-				b = temp;
-			}
-			
-			b = b - a;
-		} while(b != 0);
-		
-		return a << shift;
+	static int gcd(int a, int b) {
+	    while (a * b != 0) {
+	        if (a >= b) {
+	        	a %= b;
+	        } else {
+	        	b %= a;
+	        }
+	    }
+	    
+	    return a + b;
 	}
-	
-	/**
-	 * For integer e, 1 < e < phi, such that gcd(e, phi) == 1
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	static Boolean isCoprime(long a, long b) {
-		if(((a | b) & 1) == 0)
-			return false;
 		
-		return binary(a, b) == 1;
-	}
-	
 	/**
 	 * e and phi must be coprime
 	 * Unconcealed message is at the minimum => (1 + gcd((e - 1), (p - 1)) * (1 + gcd((e - 1), (q - 1))) == 9
@@ -97,22 +51,56 @@ public class RSAEncryption {
 	 * @return
 	 */
 	static long numberOfUnconcealedMessage(long p, long q) {
-		long pLargestPrimeFactor = wheelFactorization(p);
-		long qLargestPrimeFactor = wheelFactorization(q);		
-		long phi = p * q;
+		long pLargestPrimeFactor = trialDivision2(p);
+		long qLargestPrimeFactor = trialDivision2(q);		
+		Long phi = p * q;
 		long sumValueOfE = 0;
+		int length = phi.intValue();
+		boolean[] unconceleadMessage = new boolean[length + 1];
+		int[] gcd = new int[length + 1];
 		
-		for(long e = 3; e < phi; e += 2) {
-			if(e % 12 == 11) {
-				if(e % pLargestPrimeFactor > 1 && e % qLargestPrimeFactor > 1) {
-					if(isCoprime(e, phi)) {						
-						if(binary((e - 1), phi) == 2) {
-							sumValueOfE += e;
+		Arrays.fill(unconceleadMessage, Boolean.TRUE);
+		Arrays.fill(gcd, -1);
+				
+		long start = System.nanoTime();
+		for(int e = 1; e < length; e += 2) {
+			int previousE = e - 1;
+			
+			if(unconceleadMessage[e]) {
+				if(e % pLargestPrimeFactor <= 1 || e % qLargestPrimeFactor <= 1) {
+					unconceleadMessage[e] = false;
+				} else {
+					gcd[e] = gcd(e, length);
+															
+					if(gcd[e] != 1) {
+						unconceleadMessage[e] = false;
+					} else {
+						if(gcd[previousE] == -1) {
+							gcd[previousE] = gcd(previousE, length);
 						}
-					}	
+					}
+				}
+			}
+			
+			// Remove all even number
+			unconceleadMessage[previousE] = false;
+		}
+		
+		long end = System.nanoTime();
+		System.out.printf("Loop I took %dms%n", ((end - start) / 1000000));
+		
+		start = System.nanoTime();
+		
+		for(int e = 1; e < length; e++) {
+			if(unconceleadMessage[e]) {
+				if(gcd[e - 1] == 2) {
+					sumValueOfE += e;
 				}
 			}
 		}
+		
+		end = System.nanoTime();
+		System.out.printf("Loop II took %dms%n", ((end - start) / 1000000));
 		
 		return sumValueOfE;
 	}
@@ -148,12 +136,13 @@ public class RSAEncryption {
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		double start = System.nanoTime();
+		long start = System.nanoTime();
 	
 		//System.out.println(numberOfUnconcealedMessage(991777 - 1, 999983 - 1));
 		System.out.println(numberOfUnconcealedMessage(1009 - 1, 3643 - 1));
+		//System.out.println(numberOfUnconcealedMessage(11 - 1, 13 - 1));
 		
-		double end = System.nanoTime();
-		System.out.printf("Solution took %f.6ms", ((end - start) / 1000000));
+		long end = System.nanoTime();
+		System.out.printf("Solution took %dms", ((end - start) / 1000000));
 	}
 }
