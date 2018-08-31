@@ -29,12 +29,16 @@ public class RSAEncryption {
 		return (n > 2) ? n : f;
 	}
 	
+	static int getRemainder(int num, int divisor) {
+        return num - divisor * (num / divisor);
+    }
+	
 	static int gcd(int a, int b) {
 	    while (a * b != 0) {
 	        if (a >= b) {
-	        	a %= b;
+	        	a = getRemainder(a, b);
 	        } else {
-	        	b %= a;
+	        	b = getRemainder(b, a);
 	        }
 	    }
 	    
@@ -67,7 +71,7 @@ public class RSAEncryption {
 			int previousE = e - 1;
 			
 			if(unconceleadMessage[e]) {
-				if(e % pLargestPrimeFactor <= 1 || e % qLargestPrimeFactor <= 1) {
+				if(getRemainder(e, (int) pLargestPrimeFactor) <= 1 || getRemainder(e, (int) qLargestPrimeFactor) <= 1) {
 					unconceleadMessage[e] = false;
 				} else {
 					gcd[e] = gcd(e, length);
