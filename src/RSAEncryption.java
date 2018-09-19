@@ -1,4 +1,3 @@
-import java.util.Arrays;
 
 /**
  * https://projecteuler.net/problem=182
@@ -8,18 +7,19 @@ import java.util.Arrays;
  */
 public class RSAEncryption {
 	
-	static long trialDivision2(long n) {		
+	static int trialDivision2(int n) {		
 		while((n & 1) == 0) {
 			n /= 2;
 		}
 
-		if(n == 1)
+		if(n == 1) {
 			return 2;
+		}			
 		
 		int f = 3;
 
 		while((f * f) <= n) {
-			if(n % f == 0) {
+			if(getRemainder(n, f) == 0) {
 				n /= f;
 			} else {
 				f += 2;
@@ -34,12 +34,16 @@ public class RSAEncryption {
     }
 	
 	static int gcd(int a, int b) {
-	    while (a * b != 0) {
-	        if (a >= b) {
-	        	a = getRemainder(a, b);
-	        } else {
-	        	b = getRemainder(b, a);
-	        }
+	    while (a != 0) {
+	    	if(b != 0) {
+	    		if (a >= b) {
+		        	a = getRemainder(a, b);
+		        } else {
+		        	b = getRemainder(b, a);
+		        }
+	    	} else {
+	    		break;
+	    	}	        
 	    }
 	    
 	    return a + b;
@@ -54,58 +58,26 @@ public class RSAEncryption {
 	 * 
 	 * @return
 	 */
-	static long numberOfUnconcealedMessage(long p, long q) {
-		long pLargestPrimeFactor = trialDivision2(p);
-		long qLargestPrimeFactor = trialDivision2(q);		
-		Long phi = p * q;
+	static long numberOfUnconcealedMessage(int p, int q) {
+		int pLargestPrimeFactor = trialDivision2(p);
+		int qLargestPrimeFactor = trialDivision2(q);		
+		int phi = p * q;
 		long sumValueOfE = 0;
-		int length = phi.intValue();
-		boolean[] unconceleadMessage = new boolean[length + 1];
-		int[] gcd = new int[length + 1];
 		
-		Arrays.fill(unconceleadMessage, Boolean.TRUE);
-		Arrays.fill(gcd, -1);
-				
-		long start = System.nanoTime();
-		for(int e = 1; e < length; e += 2) {
-			int previousE = e - 1;
-			
-			if(unconceleadMessage[e]) {
-				if(getRemainder(e, (int) pLargestPrimeFactor) <= 1 || getRemainder(e, (int) qLargestPrimeFactor) <= 1) {
-					unconceleadMessage[e] = false;
+		for(int e = 1; e < phi; e += 2) {
+			if(getRemainder(e, 12) == 11) {
+				if(getRemainder(e, pLargestPrimeFactor) <= 1 || getRemainder(e, qLargestPrimeFactor) <= 1) {
+					continue;
 				} else {
-					gcd[e] = gcd(e, length);
-															
-					if(gcd[e] != 1) {
-						unconceleadMessage[e] = false;
-					} else {
-						if(gcd[previousE] == -1) {
-							gcd[previousE] = gcd(previousE, length);
+					if(gcd(e, phi) == 1) {
+						if(gcd((e - 1), phi) == 2) {
+							sumValueOfE += e;
 						}
 					}
 				}
 			}
-			
-			// Remove all even number
-			unconceleadMessage[previousE] = false;
 		}
-		
-		long end = System.nanoTime();
-		System.out.printf("Loop I took %dms%n", ((end - start) / 1000000));
-		
-		start = System.nanoTime();
-		
-		for(int e = 1; e < length; e++) {
-			if(unconceleadMessage[e]) {
-				if(gcd[e - 1] == 2) {
-					sumValueOfE += e;
-				}
-			}
-		}
-		
-		end = System.nanoTime();
-		System.out.printf("Loop II took %dms%n", ((end - start) / 1000000));
-		
+	
 		return sumValueOfE;
 	}
 
