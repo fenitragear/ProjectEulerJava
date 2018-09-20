@@ -68,44 +68,38 @@ public class XorDecryption {
 		int temp = 0;
 		byte[] keys = new byte[3];
 		byte[] cipherCopy = Arrays.copyOf(cipher, cipher.length);
-		boolean isNextFirstLetter = false;
-		boolean isProbableKey = true;
-		
+				
 		for(int k = 0; k < keys.length; k++) {
-			for(byte key = 97; key <= 122; key++) {				
+			for(byte key = 97; key <= 122; key++) {	
+				boolean isProbableKey = true;
+				
 				for(int j = k; j < cipherCopy.length; j += 3) {
 					cipherCopy[j] ^= key;
 					
-					if((j ==  0 && cipherCopy[j] == 32) || !acceptableValue.contains((int) cipherCopy[j])) {
+					if((j == 0 && cipherCopy[j] == 32) || !acceptableValue.contains((int) cipherCopy[j])) {
 						isProbableKey = false;
-						isNextFirstLetter = false;
 						cipherCopy = Arrays.copyOf(cipher, cipher.length);
 						temp = 0;
-						break;
-					} else {
-						isProbableKey = true;
-						isNextFirstLetter = (!isNextFirstLetter) ? cipherCopy[j] == 32 : isNextFirstLetter;
 						
+						break;
+					} else {					
 						temp += cipherCopy[j];
 					}
 				}
 				
 				if(isProbableKey) {
-					isProbableKey = true;
 					keys[k] = key;
 					sum += temp;
 					cipher = Arrays.copyOf(cipherCopy, cipher.length);
-					
-					if(k == 2) {
-						System.out.println("decrypted => " + new String(cipher));
-						System.out.println("key => " + new String(keys));						
-						System.out.println("sum => " + sum);
-					}
 					
 					break;
 				}
 			}
 		}
+		
+		System.out.println("decrypted => " + new String(cipher));
+		System.out.println("key => " + new String(keys));						
+		System.out.println("sum => " + sum);
 	}
 
 	/**
