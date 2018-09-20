@@ -65,13 +65,13 @@ public class XorDecryption {
 	 */
 	static void analyze() {
 		int sum = 0;
-		int temp = 0;
 		byte[] keys = new byte[3];
 		byte[] cipherCopy = Arrays.copyOf(cipher, cipher.length);
 				
 		for(int k = 0; k < keys.length; k++) {
 			for(byte key = 97; key <= 122; key++) {	
 				boolean isProbableKey = true;
+				int temp = 0;
 				
 				for(int j = k; j < cipherCopy.length; j += 3) {
 					cipherCopy[j] ^= key;
